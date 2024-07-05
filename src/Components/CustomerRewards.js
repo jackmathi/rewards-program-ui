@@ -1,25 +1,33 @@
-import { useState, useEffect } from "react";
-import { usefetch } from "../Service/api"
+import React, { useState, useEffect } from "react";
+import { usefetch } from "./common/api";
+// import { useParams } from 'react-router-dom';
+import log from 'loglevel';
 
 const CustomerRewards = () => {
   const [dataSet, setDataSet] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  // const [activeTab, setActiveTab] = useState(1);
 
   useEffect(() => {
-    const apiCall = async () => {
-    try {
-      const result = await usefetch(); // Custom Hook called
-      setDataSet(result);
-    } catch (error) {
-      console.error(error);
-    }
-     };
+    const fetchData = async () => {
+      try {
+        const result = await usefetch(); // Assuming usefetch fetches customer data
+        log.warn(' %c Data fetch Successfully !....', 'color:green; font-size:14px'); // Success logger
+        setDataSet(result);
+        // Set the first customer as selected initially
+        if (result.length > 0) {
+          setSelectedCustomer(result[0].id);
+        }
+      } catch (error) {
+        log.error('Custom hook Data fetch error!....'); // Logger error
+        console.error(error);
+      }
+    };
 
-     apiCall();
+    fetchData();
   }, []);
 
-    const calculateTotals = (transactions) => {
+  // Calculate the Total amount & points function
+  const calculateTotals = (transactions) => {
     let points = 0;
     let totalAmount = 0;
     let totalPoints = 0;
@@ -36,28 +44,33 @@ const CustomerRewards = () => {
       }
 
       totalPoints += transaction.points;
-    })
+    });
 
     return { points, totalAmount, totalPoints };
-    
-  }
-  
-  
-  const handleCustomerClick = (customerId) => {
-    setSelectedCustomer(customerId);
-    // setActiveTab(customerId);
   };
 
+  // Handle customer list side tab click event
+  const handleCustomerClick = (customerId) => {
+    setSelectedCustomer(customerId);
+  };
+
+  // Display customer detail based on selected customer
   const displayCustomerDetail = () => {
-    const {transactions=[]} = dataSet[selectedCustomer - 1]
-    const {points=0, totalAmount=0, totalPoints=0 } = calculateTotals(transactions)
-    
+    const selectedCustomerData = dataSet.find(customer => customer.id === selectedCustomer);
+    if (!selectedCustomerData) {
+      return <h2>Please select a customer.</h2>;
+    }
+
+    const { transactions = [] } = selectedCustomerData;
+    const { points = 0, totalAmount = 0, totalPoints = 0 } = calculateTotals(transactions);
+
     return (
       <div className="table-responsive">
         <table className="table table-bordered table-striped table-responsive">
           <thead>
             <tr>
               <th>Transaction ID</th>
+              <th>Date</th>
               <th>Amount</th>
               <th>Earned Points</th>
             </tr>
@@ -66,6 +79,7 @@ const CustomerRewards = () => {
             {transactions.map((transaction) => (
               <tr key={transaction.transId}>
                 <td>{transaction.transId}</td>
+                <td>{transaction.date}</td>
                 <td>${transaction.amount}</td>
                 <td>{transaction.points}</td>
               </tr>
@@ -74,14 +88,15 @@ const CustomerRewards = () => {
           <tfoot>
             <tr>
               <th scope="row">Totals:</th>
+              <th></th>
               <td>${totalAmount}</td>
               <td>{totalPoints}</td>
             </tr>
           </tfoot>
         </table>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="row">
@@ -91,8 +106,7 @@ const CustomerRewards = () => {
           <a
             key={customer.id}
             href="#"
-            className={`list-group-item list-group-item-action ${selectedCustomer === customer.id ? "active" : ""
-              }`}
+            className={`list-group-item list-group-item-action ${selectedCustomer === customer.id ? "active" : ""}`}
             onClick={() => handleCustomerClick(customer.id)}
           >
             {customer.customer}
@@ -100,13 +114,7 @@ const CustomerRewards = () => {
         ))}
       </div>
       <div className="col-8">
-        {selectedCustomer !== null && (
-          <div key={selectedCustomer}>
-            {displayCustomerDetail()}
-          </div>
-
-        )}
-        {selectedCustomer == null && <h2>Please select a customer.</h2>}
+        {displayCustomerDetail()}
       </div>
     </div>
   );
