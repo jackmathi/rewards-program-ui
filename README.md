@@ -1,4 +1,4 @@
-# rewards-program-ui
+# Rewards Program UI
 ## Overview
 This rewards program allows customers to earn points based on their purchases. The points are calculated as follows:
 
