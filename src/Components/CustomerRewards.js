@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { usefetch } from "./common/api";
-// import { useParams } from 'react-router-dom';
 import log from 'loglevel';
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'; 
 
 const CustomerRewards = () => {
   const [dataSet, setDataSet] = useState([]);
@@ -13,12 +14,20 @@ const CustomerRewards = () => {
         const result = await usefetch(); // Assuming usefetch fetches customer data
         log.warn(' %c Data fetch Successfully !....', 'color:green; font-size:14px'); // Success logger
         setDataSet(result);
+        toast.success("Fetching Customer Data Successfully!", {
+          position: "top-right",
+          autoClose: 10000, // Close after 10 seconds
+        }); // Display toast Success message
         // Set the first customer as selected initially
         if (result.length > 0) {
           setSelectedCustomer(result[0].id);
         }
       } catch (error) {
-        log.error('Custom hook Data fetch error!....'); // Logger error
+        toast.error("Error Fetching Customer Data!", {
+          position: "top-right",
+          autoClose: 10000, // Close after 10 seconds
+        }); // Display toast error message
+        log.error('Error Fetching Customer Data!....'); // Logger error
         console.error(error);
       }
     };
@@ -28,26 +37,24 @@ const CustomerRewards = () => {
 
   // Calculate the Total amount & points function
   const calculateTotals = (transactions) => {
-    let points = 0;
-    let totalAmount = 0;
-    let totalPoints = 0;
-
-    transactions.forEach((transaction) => {
-      totalAmount += transaction.amount;
-
-      if (transaction.amount >= 50 && transaction.amount < 100) {
-        transaction.points = transaction.amount - 50;
-      } else if (transaction.amount > 100) {
-        transaction.points = (((transaction.amount - 100) * 2) + 50);
-      } else {
-        transaction.points = 0;
-      }
-
-      totalPoints += transaction.points;
+    return transactions.reduce((acc, transaction) => {
+      acc.totalAmount += transaction.amount;
+  
+      transaction.points = transaction.amount >= 50 && transaction.amount < 100
+        ? transaction.amount - 50
+        : transaction.amount > 100
+          ? ((transaction.amount - 100) * 2) + 50
+          : 0;
+  
+      acc.totalPoints += transaction.points;
+  
+      return acc; // Return the accumulator for the next iteration
+    }, { // Initial accumulator (optional)
+      totalAmount: 0,
+      totalPoints: 0,
     });
-
-    return { points, totalAmount, totalPoints };
   };
+  
 
   // Handle customer list side tab click event
   const handleCustomerClick = (customerId) => {
@@ -114,6 +121,7 @@ const CustomerRewards = () => {
         ))}
       </div>
       <div className="col-8">
+        <ToastContainer />
         {displayCustomerDetail()}
       </div>
     </div>

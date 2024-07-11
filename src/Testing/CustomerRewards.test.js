@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import CustomerRewards from '../Components/CustomerRewards';
 import data from "../Components/common/CustomerData";
 
-
 beforeEach(() => {
     global.fetch = jest.fn(() => {
         Promise.resolve({

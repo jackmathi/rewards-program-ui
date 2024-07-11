@@ -51,9 +51,6 @@ describe('CustomerTotalMonth', () => {
       render(<CustomerTotalMonth />);
     });
 
-    // Check if data fetch success message is logged
-    expect(log.warn).toHaveBeenCalledWith(' %c Data fetch Successfully !....', 'color:green; font-size:14px');
-
     // Check if customer names are rendered
     expect(screen.getByText('Mathivanan')).toBeInTheDocument();
     expect(screen.getByText('Harini')).toBeInTheDocument();

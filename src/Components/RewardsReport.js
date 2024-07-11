@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import data from './common/CustomerData'; // Assuming this is where your data resides
 import { calculateMonthlyPoints, calculatePoints } from './rewards'; // Importing necessary functions
 import log from 'loglevel'; // Importing logging library
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/ReactToastify.css"
 
 function RewardsReport() {
   const [customerData, setCustomerData] = useState([]); // State to hold customer data
@@ -35,15 +37,29 @@ function RewardsReport() {
           };
         });
         setCustomerData(processedData); // Update state with processed data
+
       } catch (error) {
+        toast.error("Error Fetching Customer Data!", {
+          position: "top-right",
+          autoClose: 10000, // Close after 10 seconds
+        }); // Display toast error message
         log.error('Rewards Report fetch error!....', error); // Log error
         setError(error); // Set error state
+        toast.error("Rewards Report fetch error!", {
+          position: "top-right",
+          autoClose: 10000, // Close after 10 seconds
+        }); // Display toast error message
       } finally {
         setIsLoading(false); // Set loading to false after fetch completes
       }
     };
 
     fetchData(); // Fetch data on component mount
+    toast.success("Fetching Customer Data Successfully!", {
+      position: "top-right",
+      autoClose: 10000, // Close after 10 seconds
+    });// Display toast Success message
+    
   }, []); // Empty dependency array ensures this effect runs only once
 
   if (isLoading) {
@@ -55,14 +71,10 @@ function RewardsReport() {
   }
 
   // Calculate all unique months with transactions across all customers
+
   const allMonths = customerData.reduce((months, customer) => {
-    customer.transactions.forEach((transaction) => {
-      const month = new Date(transaction.date).toLocaleString('en-US', { month: 'long' });
-      if (!months.includes(month)) {
-        months.push(month);
-      }
-    });
-    return months;
+    const uniqueMonths = new Set([...months, ...customer.transactions.map(transaction => new Date(transaction.date).toLocaleString('en-US', { month: 'long' }))]);
+    return [...uniqueMonths]; // Convert Set back to an array
   }, []);
 
   return (
@@ -94,6 +106,7 @@ function RewardsReport() {
           ))}
         </tbody>
       </table>
+      <ToastContainer />
     </div>
   );
 }

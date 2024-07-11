@@ -4,9 +4,7 @@ import RewardsReport from './RewardsReport';
 import CustomertotalMonth from './TotalAmount';
 const Header = () => {
     return (
-      <BrowserRouter>
-      <div class="container">
-      <div class="row">
+    
 <nav className="navbar navbar-expand-lg bg-body-tertiary ">
   <div className="container-fluid">
   <div className="collapse navbar-collapse" id="navbarSupportedContent">
@@ -20,16 +18,6 @@ const Header = () => {
     </div>
     </div>
     </nav>
-    <div className="mainBody">
-    <Routes>
-        <Route path="/" element={ <CustomerRewards/> } />
-        <Route path="rewardreport" element={ <RewardsReport/> } />
-        <Route path="totalamout" element={ <CustomertotalMonth/> } />
-      </Routes>
-</div>
-</div>
-</div>
-</BrowserRouter>
       
     )
   }

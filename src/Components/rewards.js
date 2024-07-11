@@ -17,10 +17,10 @@ export function calculatePoints(amount) {
                            'July', 'August', 'September', 'October', 'November', 'December'];
   
       // Ensure month is within valid range (0-11)
-      if (month < 0 || month > 11) {
-        console.warn(`Encountered unexpected month: ${month}`);
-        return monthlyPoints;  // Skip processing this transaction (optional)
-      }
+      // if (month < 0 || month > 11) {
+      //   console.warn(`Encountered unexpected month: ${month}`);
+      //   return monthlyPoints;  // Skip processing this transaction (optional)
+      // }
   
       const monthName = monthNames[month];
       monthlyPoints[monthName] = (monthlyPoints[monthName] || 0) + calculatePoints(transaction.amount);
