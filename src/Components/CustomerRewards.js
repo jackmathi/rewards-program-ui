@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 const CustomerRewards = () => {
   const [dataSet, setDataSet] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,11 +32,21 @@ const CustomerRewards = () => {
         log.error('Error Fetching Customer Data!....'); // Logger error
         console.error(error);
       }
+      finally {
+        setIsLoading(false); // Set loading to false after fetch completes
+      }
     };
 
     fetchData();
   }, []);
 
+  if (isLoading) {
+    return <div className="loader">Loading...</div>; // Display loading message while fetching data
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>; // Display error message if fetch fails
+  }
   // Calculate the Total amount & points function
   const calculateTotals = (transactions) => {
     return transactions.reduce((acc, transaction) => {
@@ -64,9 +76,9 @@ const CustomerRewards = () => {
   // Display customer detail based on selected customer
   const displayCustomerDetail = () => {
     const selectedCustomerData = dataSet.find(customer => customer.id === selectedCustomer);
-    if (!selectedCustomerData) {
-      return <h2>Please select a customer.</h2>;
-    }
+    // if (!selectedCustomerData) {
+    //   return <h2>Please select a customer.</h2>;
+    // }
 
     const { transactions = [] } = selectedCustomerData;
     const { points = 0, totalAmount = 0, totalPoints = 0 } = calculateTotals(transactions);

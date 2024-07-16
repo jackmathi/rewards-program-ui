@@ -63,7 +63,7 @@ function RewardsReport() {
   }, []); // Empty dependency array ensures this effect runs only once
 
   if (isLoading) {
-    return <div>Loading...</div>; // Display loading message while fetching data
+    return <div className="loader">Loading...</div>; // Display loading message while fetching data
   }
 
   if (error) {

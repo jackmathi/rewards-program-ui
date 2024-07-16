@@ -1,4 +1,3 @@
-//totalmonth.js
 import React, { useState, useEffect } from "react";
 import { usefetch } from "./common/api"; // Assuming `usefetch` fetches customer data
 import log from 'loglevel';
@@ -9,12 +8,16 @@ const CustomerTotalMonth = () => {
   const [dataSet, setDataSet] = useState([]);
   const [formattedDataSet, setFormattedDataSet] = useState([]);
   const [allMonths, setAllMonths] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true); // Set loading to true before fetching
+      setError(null); // Clear any previous errors
       try {
         const result = await usefetch();
-       // log.warn(' %c Data fetch Successfully !....', 'color:green; font-size:14px'); // Success logger
+      //  throw new Error('catch my err')
         setDataSet(result);
         toast.success("Fetching Customer Data Successfully!", {
           position: "top-right",
@@ -28,10 +31,14 @@ const CustomerTotalMonth = () => {
         }); // Display toast error message
        // console.error(error);
       }
+      finally {
+        setIsLoading(false); // Set loading to false after fetch completes
+      }
     };
 
     fetchData();
   }, []);
+
 
   useEffect(() => {
     const allMonths = dataSet.reduce((months, customer) => {
@@ -41,6 +48,7 @@ const CustomerTotalMonth = () => {
     formatData(allMonths)
   },[dataSet])
 
+  
   const formatData = (allMonths) => {
     const newData = dataSet.map((customerRow) => {
       const { transactions = [] , customer} = customerRow;
@@ -66,6 +74,15 @@ const CustomerTotalMonth = () => {
     })
     setAllMonths(allMonths)
     setFormattedDataSet(newData)
+  }
+
+  
+  if (isLoading) {
+    return <div className="loader">Loading...</div>; // Display loading message while fetching data
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>; // Display error message if fetch fails
   }
 
   function sortObject(obj) {
@@ -97,9 +114,9 @@ const CustomerTotalMonth = () => {
 
   const displayCustomers = () => {
     
-    if (formattedDataSet.length === 0) {
-      return <div>Loading...</div>;
-    }
+    // if (formattedDataSet.length === 0) {
+    //   return <div>Loading...</div>;
+    // }
 
     return (
       <table className="table table-bordered table-striped table-responsive">
