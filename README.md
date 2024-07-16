@@ -36,3 +36,4 @@ Total points earned: 40 points + 50 points = 90 points
 - Testing-library
 - loglevel for logging purposes
 - React Router
+- Toast Library (Error and success messages will be clearly displayed in the user interface.)
