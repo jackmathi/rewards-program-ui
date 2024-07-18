@@ -1,7 +1,5 @@
-import { BrowserRouter, RouterProvider, Route, Link, Routes } from 'react-router-dom';
-import CustomerRewards from './CustomerRewards';
-import RewardsReport from './RewardsReport';
-import CustomertotalMonth from './TotalAmount';
+import React from 'react';
+import { Link } from 'react-router-dom';
 const Header = () => {
     return (
     

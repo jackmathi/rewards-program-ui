@@ -65,3 +65,11 @@ li a:hover {
 .container {
   margin-top: 3.75rem !important;
 }
+.loader
+{
+  font-size: 22px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

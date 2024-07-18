@@ -3,7 +3,6 @@ import data from './common/CustomerData'; // Assuming this is where your data re
 import { calculateMonthlyPoints, calculatePoints } from './rewards'; // Importing necessary functions
 import log from 'loglevel'; // Importing logging library
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/ReactToastify.css"
 
 function RewardsReport() {
   const [customerData, setCustomerData] = useState([]); // State to hold customer data
@@ -29,10 +28,10 @@ function RewardsReport() {
           return {
             ...customer,
             monthlyPoints,
-            totalPoints: customer.transactions.reduce(
+            totalPoints: Math.floor(customer.transactions.reduce(
               (acc, transaction) => acc + calculatePoints(transaction.amount),
               0
-            ),
+            )),
             usedMonths, // Add usedMonths property
           };
         });
@@ -45,10 +44,6 @@ function RewardsReport() {
         }); // Display toast error message
         log.error('Rewards Report fetch error!....', error); // Log error
         setError(error); // Set error state
-        toast.error("Rewards Report fetch error!", {
-          position: "top-right",
-          autoClose: 10000, // Close after 10 seconds
-        }); // Display toast error message
       } finally {
         setIsLoading(false); // Set loading to false after fetch completes
       }
@@ -67,6 +62,7 @@ function RewardsReport() {
   }
 
   if (error) {
+    
     return <div>Error: {error.message}</div>; // Display error message if fetch fails
   }
 

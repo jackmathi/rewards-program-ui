@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { usefetch } from "./common/api";
-import log from 'loglevel';
+import log from "loglevel";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'; 
+//import 'react-toastify/dist/ReactToastify.css';
 
 const CustomerRewards = () => {
   const [dataSet, setDataSet] = useState([]);
@@ -12,9 +12,14 @@ const CustomerRewards = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true); // Set loading to true before fetching
+      setError(null); // Clear any previous errors
       try {
         const result = await usefetch(); // Assuming usefetch fetches customer data
-        log.warn(' %c Data fetch Successfully !....', 'color:green; font-size:14px'); // Success logger
+        log.warn(
+          " %c Data fetch Successfully !....",
+          "color:green; font-size:14px"
+        ); // Success logger
         setDataSet(result);
         toast.success("Fetching Customer Data Successfully!", {
           position: "top-right",
@@ -25,14 +30,14 @@ const CustomerRewards = () => {
           setSelectedCustomer(result[0].id);
         }
       } catch (error) {
+        setError(error); // Set error state
         toast.error("Error Fetching Customer Data!", {
           position: "top-right",
           autoClose: 10000, // Close after 10 seconds
         }); // Display toast error message
-        log.error('Error Fetching Customer Data!....'); // Logger error
+        log.error("Error Fetching Customer Data!...."); // Logger error
         console.error(error);
-      }
-      finally {
+      } finally {
         setIsLoading(false); // Set loading to false after fetch completes
       }
     };
@@ -49,24 +54,29 @@ const CustomerRewards = () => {
   }
   // Calculate the Total amount & points function
   const calculateTotals = (transactions) => {
-    return transactions.reduce((acc, transaction) => {
-      acc.totalAmount += transaction.amount;
-  
-      transaction.points = transaction.amount >= 50 && transaction.amount < 100
-        ? transaction.amount - 50
-        : transaction.amount > 100
-          ? ((transaction.amount - 100) * 2) + 50
-          : 0;
-  
-      acc.totalPoints += transaction.points;
-  
-      return acc; // Return the accumulator for the next iteration
-    }, { // Initial accumulator (optional)
-      totalAmount: 0,
-      totalPoints: 0,
-    });
+    return transactions.reduce(
+      (acc, transaction) => {
+        // acc.totalAmount += transaction.amount;
+        acc.totalAmount += Math.floor(transaction.amount);
+
+        transaction.points =
+          transaction.amount >= 50 && transaction.amount < 100
+            ? transaction.amount - 50
+            : transaction.amount > 100
+            ? (transaction.amount - 100) * 2 + 50
+            : 0;
+
+        acc.totalPoints += Math.floor(transaction.points); 
+
+        return acc; // Return the accumulator for the next iteration
+      },
+      {
+        // Initial accumulator (optional)
+        totalAmount: 0,
+        totalPoints: 0,
+      }
+    );
   };
-  
 
   // Handle customer list side tab click event
   const handleCustomerClick = (customerId) => {
@@ -75,13 +85,15 @@ const CustomerRewards = () => {
 
   // Display customer detail based on selected customer
   const displayCustomerDetail = () => {
-    const selectedCustomerData = dataSet.find(customer => customer.id === selectedCustomer);
+    const selectedCustomerData = dataSet.find(
+      (customer) => customer.id === selectedCustomer
+    );
     // if (!selectedCustomerData) {
     //   return <h2>Please select a customer.</h2>;
     // }
 
     const { transactions = [] } = selectedCustomerData;
-    const { points = 0, totalAmount = 0, totalPoints = 0 } = calculateTotals(transactions);
+    const { totalAmount = 0, totalPoints = 0 } = calculateTotals(transactions);
 
     return (
       <div className="table-responsive">
@@ -99,8 +111,8 @@ const CustomerRewards = () => {
               <tr key={transaction.transId}>
                 <td>{transaction.transId}</td>
                 <td>{transaction.date}</td>
-                <td>${transaction.amount}</td>
-                <td>{transaction.points}</td>
+                <td>${transaction.amount.toFixed(0)}</td>
+                <td>{transaction.points.toFixed(0)}</td>
               </tr>
             ))}
           </tbody>
@@ -123,9 +135,11 @@ const CustomerRewards = () => {
       <div className="col-4 list-group">
         {dataSet.map((customer) => (
           <a
+            href={"#"}
             key={customer.id}
-            href="#"
-            className={`list-group-item list-group-item-action ${selectedCustomer === customer.id ? "active" : ""}`}
+            className={`list-group-item list-group-item-action ${
+              selectedCustomer === customer.id ? "active" : ""
+            }`}
             onClick={() => handleCustomerClick(customer.id)}
           >
             {customer.customer}
