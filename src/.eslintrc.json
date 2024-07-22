@@ -14,7 +14,7 @@
     "plugins": ["react", "react-hooks"],
     "rules": {
       //add customize rules here as per your project's needs
-      "fix": true // Enables autofix for all fixable rules
+       "fix": true // Enables autofix for all fixable rules
     }
     
 }  

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import data from './common/CustomerData'; // Assuming this is where your data resides
-import { calculateMonthlyPoints, calculatePoints } from './rewards'; // Importing necessary functions
+import data from './common/CustomerData'; 
+import { calculateMonthlyPoints, calculatePoints, isValidDate } from './rewards'; // Importing necessary functions
 import log from 'loglevel'; // Importing logging library
 import { toast, ToastContainer } from "react-toastify";
 
@@ -22,13 +22,15 @@ function RewardsReport() {
 
         // Process and update data
         const processedData = simulatedResponse.map((customer) => {
-          const monthlyPoints = calculateMonthlyPoints(customer.transactions);
+          const {transactions} = customer
+          const validTransactions = transactions.filter(trans => isValidDate(trans.date))
+          const monthlyPoints = calculateMonthlyPoints(validTransactions);
           // Extract used month names from monthlyPoints object
           const usedMonths = Object.keys(monthlyPoints);
           return {
             ...customer,
             monthlyPoints,
-            totalPoints: Math.floor(customer.transactions.reduce(
+            totalPoints: Math.floor(validTransactions.reduce(
               (acc, transaction) => acc + calculatePoints(transaction.amount),
               0
             )),
@@ -69,7 +71,10 @@ function RewardsReport() {
   // Calculate all unique months with transactions across all customers
 
   const allMonths = customerData.reduce((months, customer) => {
-    const uniqueMonths = new Set([...months, ...customer.transactions.map(transaction => new Date(transaction.date).toLocaleString('en-US', { month: 'long' }))]);
+    const {transactions = []} = customer
+    const validTransactions = transactions.filter(trans => isValidDate(trans.date))
+    const uniqueMonths = new Set([...months, ...validTransactions.map(transaction => new Date(transaction.date).toLocaleString('en-US', { month:'long',year:'numeric' }))]);
+
     return [...uniqueMonths]; // Convert Set back to an array
   }, []);
 

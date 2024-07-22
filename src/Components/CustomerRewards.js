@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { usefetch } from "./common/api";
 import log from "loglevel";
 import { toast, ToastContainer } from "react-toastify";
-//import 'react-toastify/dist/ReactToastify.css';
 
 const CustomerRewards = () => {
   const [dataSet, setDataSet] = useState([]);
@@ -88,13 +87,26 @@ const CustomerRewards = () => {
     const selectedCustomerData = dataSet.find(
       (customer) => customer.id === selectedCustomer
     );
-    // if (!selectedCustomerData) {
-    //   return <h2>Please select a customer.</h2>;
-    // }
-
+  
+    if (!selectedCustomerData) {
+      return <div>No data found for selected customer.</div>;
+    }
+  
     const { transactions = [] } = selectedCustomerData;
-    const { totalAmount = 0, totalPoints = 0 } = calculateTotals(transactions);
-
+  
+    // Filter transactions to include only the last 3 months
+    const currentDate = new Date();
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  
+    const filteredTransactions = transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.date);
+      return transactionDate >= threeMonthsAgo && transactionDate <= currentDate;
+    });
+  
+    // Calculate totals based on filtered transactions
+    const { totalAmount = 0, totalPoints = 0 } = calculateTotals(filteredTransactions);
+  
     return (
       <div className="table-responsive">
         <table className="table table-bordered table-striped table-responsive">
@@ -107,12 +119,12 @@ const CustomerRewards = () => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction) => (
+            {filteredTransactions.map((transaction) => (
               <tr key={transaction.transId}>
                 <td>{transaction.transId}</td>
                 <td>{transaction.date}</td>
-                <td>${transaction.amount.toFixed(0)}</td>
-                <td>{transaction.points.toFixed(0)}</td>
+                <td>${Math.floor(transaction.amount)}</td>
+                <td>{Math.floor(transaction.points)}</td>
               </tr>
             ))}
           </tbody>
@@ -128,6 +140,7 @@ const CustomerRewards = () => {
       </div>
     );
   };
+  
 
   return (
     <div className="row">

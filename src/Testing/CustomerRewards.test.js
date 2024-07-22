@@ -22,19 +22,18 @@ test("renders CustomerRewards component correctly", () => {
 
 test("Fetch is called and displayed in the UI", async () => {
   render(<CustomerRewards />);
-  await waitFor(() => {
-    expect(screen.getByText(/Harish/i)).toBeInTheDocument();
-  });
-});
+  // Wait for "Harish" to appear (using findByText for potential delays)
+  const harishElement = await waitFor(() => screen.findByText(/Harish/i));
 
-test("After customer switch totals is displayed", async () => {
+  expect(harishElement).toBeInTheDocument();
+});
+test("Fetch is called and displayed in the UI (clicks Harish and waits for totals)", async () => {
   render(<CustomerRewards />);
-  await waitFor(async () => {
-    expect(screen.getByText(/Harish/i)).toBeInTheDocument();
-    const anchorElement = screen.getByText(/Harish/i);
-    userEvent.click(anchorElement);
-    await waitFor(() => {
-      expect(screen.getByText(/totals/i)).toBeInTheDocument();
-    });
-  });
+
+  // Wait for "Harish" to appear
+  await screen.findByText(/Harish/i);
+  const harishElement = screen.getByText(/Harish/i);
+  userEvent.click(harishElement);
+  // Wait for "totals" to appear 
+  await screen.findByText(/totals/i);
 });

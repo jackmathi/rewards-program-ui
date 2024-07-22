@@ -15,21 +15,20 @@ const CustomerTotalMonth = () => {
     const fetchData = async () => {
       setIsLoading(true); // Set loading to true before fetching
       setError(null); // Clear any previous errors
+      
       try {
         const result = await usefetch();
-        //  throw new Error('catch my err')
         setDataSet(result);
         toast.success("Fetching Customer Data Successfully!", {
           position: "top-right",
           autoClose: 10000, // Close after 10 seconds
-        }); // Display toast success message
+        });
       } catch (error) {
-        log.error("Custom hook Data fetch error!...."); // Logger error
+        log.error("Custom hook Data fetch error!....");
         toast.error("Error Fetching Customer Data!", {
           position: "top-right",
           autoClose: 10000, // Close after 10 seconds
-        }); // Display toast error message
-        // console.error(error);
+        });
       } finally {
         setIsLoading(false); // Set loading to false after fetch completes
       }
@@ -39,97 +38,94 @@ const CustomerTotalMonth = () => {
   }, []);
 
   useEffect(() => {
-    const allMonths = dataSet.reduce((months, customer) => {
-      const uniqueMonths = new Set([
-        ...months,
-        ...customer.transactions.map((transaction) =>
-          new Date(transaction.date).toLocaleString("en-US", { month: "long" })
-        ),
-      ]);
-      return [...uniqueMonths]; // Convert Set back to an array
-    }, []);
-    formatData(allMonths);
+    // Calculate current month and last three months
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
+    const lastThreeMonths = [];
+    for (let i = 0; i < 3; i++) {
+      lastThreeMonths.unshift(
+        currentDate.toLocaleString("en-US", {
+          month: "long",
+          year: "numeric",
+        })
+      );
+      currentDate.setMonth(currentDate.getMonth() - 1);
+    }
+    const requiredMonths = [currentMonth, ...lastThreeMonths];
+
+    formatData(requiredMonths);
   }, [dataSet]);
 
-  const formatData = (allMonths) => {
+  const formatData = (requiredMonths) => {
+    const currentDate = new Date();
+    const lastThreeMonths = [];
+    
+    // Calculate the last three months including the current month
+    for (let i = 0; i < 3; i++) {
+      lastThreeMonths.unshift(
+        currentDate.toLocaleString("en-US", {
+          month: "long",
+          year: "numeric",
+        })
+      );
+      currentDate.setMonth(currentDate.getMonth() - 1);
+    }
+  
     const newData = dataSet.map((customerRow) => {
       const { transactions = [], customer } = customerRow;
       const customerData = {};
       let monthlyTotals = calculateMonthlyTotals(transactions);
-      const months = Object.keys(monthlyTotals);
-      console.log(months);
-      const totalAmount = Object.values(monthlyTotals).reduce(
+      // Filter out months not in lastThreeMonths
+      const filteredMonthlyTotals = requiredMonths.reduce((acc, month) => {
+        acc[month] = monthlyTotals[month] || 0;
+        return acc;
+      }, {});
+  
+      const totalAmount = Object.values(filteredMonthlyTotals).reduce(
         (sum, amount) => Math.floor(sum + amount),
         0
       );
+  
       customerData["customer"] = customer;
+      customerData["newMonthlyTotals"] = sortObject(filteredMonthlyTotals);
       customerData["totalAmount"] = totalAmount;
-      const diffMonth = allMonths.filter((month) => !months.includes(month));
-      if (diffMonth.length) {
-        const diffMonthObj = diffMonth.reduce((newObj, month) => {
-          newObj[month] = 0;
-          return newObj;
-        }, {});
-        monthlyTotals = { ...monthlyTotals, ...diffMonthObj };
-      }
-
-      customerData["newMonthlyTotals"] = sortObject(monthlyTotals);
-
-      // console.log('customerData---',customerData);
+  
       return customerData;
     });
-    setAllMonths(allMonths);
+  
+    setAllMonths(lastThreeMonths);
     setFormattedDataSet(newData);
   };
+  
 
-  if (isLoading) {
-    return <div className="loader">Loading...</div>; // Display loading message while fetching data
-  }
+  const sortObject = (obj) => {
+    const sortedObj = Object.keys(obj).map((key) => ({
+      month: key,
+      amount: obj[key],
+    }));
 
-  if (error) {
-    return <div>Error: {error.message}</div>; // Display error message if fetch fails
-  }
 
-  function sortObject(obj) {
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    const sortedObj = Object.keys(obj)
-      .sort((a, b) => monthNames.indexOf(a) - monthNames.indexOf(b))
-      .reduce(function (result, key) {
-        result[key] = obj[key];
-        return result;
-      }, {});
-    let td = [];
-    Object.values(sortedObj).forEach((value, index) => {
-      td.push(<td key={index}>{value}</td>);
+    sortedObj.sort((a, b) => {
+      return new Date(b.month) - new Date(a.month);
     });
-    return td;
-  }
+    return sortedObj;
+  };
 
-  // Calculate the monthly total amount function
   const calculateMonthlyTotals = (transactions) => {
     return transactions.reduce((monthlyTotals, transaction) => {
-      if (!transaction.amount) return monthlyTotals; // Skip transactions with missing amount
+      if (!transaction.amount) return monthlyTotals;
 
       const month = new Date(transaction.date).toLocaleString("en-US", {
         month: "long",
+        year: "numeric",
       });
-      monthlyTotals[month] = (monthlyTotals[month] || 0) + Math.floor(transaction.amount); // Initialize if needed
+      monthlyTotals[month] = (monthlyTotals[month] || 0) + Math.floor(transaction.amount);
 
       return monthlyTotals;
-    }, {}); // Initial accumulator (empty object)
+    }, {});
   };
 
   const displayCustomers = () => {
@@ -145,16 +141,19 @@ const CustomerTotalMonth = () => {
           </tr>
         </thead>
         <tbody>
-          {formattedDataSet.map((row) => {
+          {formattedDataSet.map((row, index) => {
             const { customer, totalAmount, newMonthlyTotals } = row;
 
             if (!customer) return null;
-            const key =
-              customer?.id || Math.random().toString(36).substring(2, 15);
+            const key = customer?.id || `row-${index}`;
             return (
               <tr key={key}>
                 <td>{customer}</td>
-                {newMonthlyTotals}
+                {allMonths.map((month) => (
+        <td key={month}>
+          {newMonthlyTotals.find((item) => item.month === month)?.amount || 0}
+        </td>
+      ))}
                 <td>{totalAmount.toFixed(0)}</td>
               </tr>
             );
@@ -163,6 +162,14 @@ const CustomerTotalMonth = () => {
       </table>
     );
   };
+
+  if (isLoading) {
+    return <div className="loader">Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div className="row">

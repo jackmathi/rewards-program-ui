@@ -8,23 +8,24 @@ export function calculatePoints(amount) {
   }
 }
 
+export function isValidDate (date) {
+  const currentDate = new Date()
+  let expectedDate = new Date()
+  const transactionDate = new Date(date)
+  expectedDate.setMonth(currentDate.getMonth() - 3)
+  //console.log('expectedDate---------',expectedDate, transactionDate, expectedDate <= transactionDate && transactionDate <= currentDate);
+  return expectedDate <= transactionDate && transactionDate <= currentDate
+}
+
 export function calculateMonthlyPoints(transactions) {
-  return transactions.reduce((monthlyPoints, transaction) => {
-    const month = new Date(transaction.date).getMonth();
-
-    // Use an array of month names instead of object keys
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                         'July', 'August', 'September', 'October', 'November', 'December'];
-
-    // Ensure month is within valid range (0-11)
-    // if (month < 0 || month > 11) {
-    //   console.warn(`Encountered unexpected month: ${month}`);
-    //   return monthlyPoints;  // Skip processing this transaction (optional)
-    // }
-    const monthName = monthNames[month];
-    monthlyPoints[monthName] = (monthlyPoints[monthName] || 0) + calculatePoints(Math.floor(transaction.amount));
-//console.log(monthlyPoints.toFixed(0));
+  const monthlyPoints = transactions.reduce((monthlyPoints, transaction) => {
+    if(isValidDate(transaction.date)) {
+      const month = new Date(transaction.date).toLocaleString('en-US', { month:'long',year:'numeric' })
+      monthlyPoints[month] = (monthlyPoints[month] || 0) + calculatePoints(Math.floor(transaction.amount));
+    } 
     return monthlyPoints;
   }, {}); // Empty object as initial accumulator
+  return monthlyPoints
 }
+
 

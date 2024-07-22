@@ -35,7 +35,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint:fix": "eslint --fix ."
+    "lint": "eslint --fix --ext .js,.jsx ."
   },
   "resolutions": {
     "react-error-overlay": "6.0.9"
