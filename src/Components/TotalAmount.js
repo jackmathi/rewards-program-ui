@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { usefetch } from "./common/api"; // Assuming `usefetch` fetches customer data
+import { usefetch } from "../Service/api";
 import log from "loglevel";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const CustomerTotalMonth = () => {
+  // State hooks for various data and status
   const [dataSet, setDataSet] = useState([]);
   const [formattedDataSet, setFormattedDataSet] = useState([]);
   const [allMonths, setAllMonths] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
+  const [requiredMonths, setRequiredMonths] = useState([])
 
+// Fetch data from the API when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true); // Set loading to true before fetching
@@ -37,8 +40,8 @@ const CustomerTotalMonth = () => {
     fetchData();
   }, []);
 
+  // Calculate current month and last three months
   useEffect(() => {
-    // Calculate current month and last three months
     const currentDate = new Date();
     const currentMonth = currentDate.toLocaleString("en-US", {
       month: "long",
@@ -55,11 +58,12 @@ const CustomerTotalMonth = () => {
       currentDate.setMonth(currentDate.getMonth() - 1);
     }
     const requiredMonths = [currentMonth, ...lastThreeMonths];
-
-    formatData(requiredMonths);
+    setRequiredMonths(requiredMonths)
+    // formatData(requiredMonths);
   }, [dataSet]);
 
-  const formatData = (requiredMonths) => {
+  // Format data based on the required months and update the state
+  useEffect(() => {
     const currentDate = new Date();
     const lastThreeMonths = [];
     
@@ -78,6 +82,7 @@ const CustomerTotalMonth = () => {
       const { transactions = [], customer } = customerRow;
       const customerData = {};
       let monthlyTotals = calculateMonthlyTotals(transactions);
+
       // Filter out months not in lastThreeMonths
       const filteredMonthlyTotals = requiredMonths.reduce((acc, month) => {
         acc[month] = monthlyTotals[month] || 0;
@@ -85,7 +90,7 @@ const CustomerTotalMonth = () => {
       }, {});
   
       const totalAmount = Object.values(filteredMonthlyTotals).reduce(
-        (sum, amount) => Math.floor(sum + amount),
+        (sum, amount) => Math.round(sum + amount),
         0
       );
   
@@ -98,8 +103,9 @@ const CustomerTotalMonth = () => {
   
     setAllMonths(lastThreeMonths);
     setFormattedDataSet(newData);
-  };
-  
+
+  }, [requiredMonths, dataSet])
+
 
   const sortObject = (obj) => {
     const sortedObj = Object.keys(obj).map((key) => ({
@@ -114,6 +120,11 @@ const CustomerTotalMonth = () => {
     return sortedObj;
   };
 
+  /**
+   * 
+   * @param {*} transactions -Array which is having list of transaction of the customer
+   * @returns 
+   */
   const calculateMonthlyTotals = (transactions) => {
     return transactions.reduce((monthlyTotals, transaction) => {
       if (!transaction.amount) return monthlyTotals;
@@ -122,12 +133,12 @@ const CustomerTotalMonth = () => {
         month: "long",
         year: "numeric",
       });
-      monthlyTotals[month] = (monthlyTotals[month] || 0) + Math.floor(transaction.amount);
+      monthlyTotals[month] = (monthlyTotals[month] || 0) + Math.round(transaction.amount);
 
       return monthlyTotals;
     }, {});
   };
-
+//* Display the customer data in a table format.
   const displayCustomers = () => {
     return (
       <table className="table table-bordered table-striped table-responsive">
@@ -154,7 +165,7 @@ const CustomerTotalMonth = () => {
           {newMonthlyTotals.find((item) => item.month === month)?.amount || 0}
         </td>
       ))}
-                <td>{totalAmount.toFixed(0)}</td>
+                <td>{totalAmount}</td>
               </tr>
             );
           })}
@@ -162,7 +173,7 @@ const CustomerTotalMonth = () => {
       </table>
     );
   };
-
+  // Render loading, error, or customer data based on the current state
   if (isLoading) {
     return <div className="loader">Loading...</div>;
   }

@@ -1,3 +1,4 @@
+// * Calculate reward points based on the transaction amount.
 export function calculatePoints(amount) {
   if (amount <= 50) {
     return 0;
@@ -7,25 +8,25 @@ export function calculatePoints(amount) {
     return 2 * (amount - 100) + 50;
   }
 }
-
+//* Check if a given date is within the last three months.
 export function isValidDate (date) {
-  const currentDate = new Date()
-  let expectedDate = new Date()
-  const transactionDate = new Date(date)
-  expectedDate.setMonth(currentDate.getMonth() - 3)
-  //console.log('expectedDate---------',expectedDate, transactionDate, expectedDate <= transactionDate && transactionDate <= currentDate);
-  return expectedDate <= transactionDate && transactionDate <= currentDate
+  const currentDate = new Date();
+  const expectedDate = new Date();
+  const transactionDate = new Date(date);
+  expectedDate.setMonth(currentDate.getMonth() - 3);
+  return expectedDate <= transactionDate && transactionDate <= currentDate;
 }
 
+// * Calculate monthly reward points based on transactions.
 export function calculateMonthlyPoints(transactions) {
   const monthlyPoints = transactions.reduce((monthlyPoints, transaction) => {
     if(isValidDate(transaction.date)) {
-      const month = new Date(transaction.date).toLocaleString('en-US', { month:'long',year:'numeric' })
-      monthlyPoints[month] = (monthlyPoints[month] || 0) + calculatePoints(Math.floor(transaction.amount));
+      const month = new Date(transaction.date).toLocaleString("en-US", { month:"long",year:"numeric" });
+      monthlyPoints[month] = (monthlyPoints[month] || 0) + calculatePoints(Math.round(transaction.amount));
     } 
     return monthlyPoints;
   }, {}); // Empty object as initial accumulator
-  return monthlyPoints
+  return monthlyPoints;
 }
 
 

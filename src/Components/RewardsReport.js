@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import data from './common/CustomerData'; 
-import { calculateMonthlyPoints, calculatePoints, isValidDate } from './rewards'; // Importing necessary functions
-import log from 'loglevel'; // Importing logging library
+import React, { useState, useEffect } from "react";
+import data from "../Service/CustomerData";
+import { calculateMonthlyPoints, calculatePoints, isValidDate } from "./rewards"; // Importing necessary functions
+import log from "loglevel"; // Importing logging library
 import { toast, ToastContainer } from "react-toastify";
 
 function RewardsReport() {
@@ -22,15 +22,15 @@ function RewardsReport() {
 
         // Process and update data
         const processedData = simulatedResponse.map((customer) => {
-          const {transactions} = customer
-          const validTransactions = transactions.filter(trans => isValidDate(trans.date))
+          const {transactions} = customer;
+          const validTransactions = transactions.filter(trans => isValidDate(trans.date));
           const monthlyPoints = calculateMonthlyPoints(validTransactions);
           // Extract used month names from monthlyPoints object
           const usedMonths = Object.keys(monthlyPoints);
           return {
             ...customer,
             monthlyPoints,
-            totalPoints: Math.floor(validTransactions.reduce(
+            totalPoints: Math.round(validTransactions.reduce(
               (acc, transaction) => acc + calculatePoints(transaction.amount),
               0
             )),
@@ -44,7 +44,7 @@ function RewardsReport() {
           position: "top-right",
           autoClose: 10000, // Close after 10 seconds
         }); // Display toast error message
-        log.error('Rewards Report fetch error!....', error); // Log error
+        log.error("Rewards Report fetch error!....", error); // Log error
         setError(error); // Set error state
       } finally {
         setIsLoading(false); // Set loading to false after fetch completes
@@ -71,9 +71,9 @@ function RewardsReport() {
   // Calculate all unique months with transactions across all customers
 
   const allMonths = customerData.reduce((months, customer) => {
-    const {transactions = []} = customer
-    const validTransactions = transactions.filter(trans => isValidDate(trans.date))
-    const uniqueMonths = new Set([...months, ...validTransactions.map(transaction => new Date(transaction.date).toLocaleString('en-US', { month:'long',year:'numeric' }))]);
+    const {transactions = []} = customer;
+    const validTransactions = transactions.filter(trans => isValidDate(trans.date));
+    const uniqueMonths = new Set([...months, ...validTransactions.map(transaction => new Date(transaction.date).toLocaleString("en-US", { month:"long",year:"numeric" }))]);
 
     return [...uniqueMonths]; // Convert Set back to an array
   }, []);

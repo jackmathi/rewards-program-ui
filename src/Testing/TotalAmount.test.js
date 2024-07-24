@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import CustomerTotalMonth from "../Components/TotalAmount";
-import { usefetch } from "../Components/common/api";
+import { usefetch } from "../Service/api";
 import log from "loglevel";
 
 // Mock usefetch function
-jest.mock("../Components/common/api", () => ({
+jest.mock("../Service/api", () => ({
   usefetch: jest.fn(),
 }));
 
@@ -52,7 +52,6 @@ describe("CustomerTotalMonth", () => {
   test("renders customer data and monthly totals correctly", async () => {
     // Mock usefetch to return mockData
     usefetch.mockResolvedValue(mockData);
-
     await act(async () => {
       render(<CustomerTotalMonth />);
     });

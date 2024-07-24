@@ -1,8 +1,9 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CustomerRewards from "../Components/CustomerRewards";
-import data from "../Components/common/CustomerData";
+import data from "../Service/CustomerData";
+
 
 beforeEach(() => {
   global.fetch = jest.fn(() => {
@@ -16,8 +17,12 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
-test("renders CustomerRewards component correctly", () => {
-  render(<CustomerRewards />);
+test('renders CustomerRewards component correctly', async () => {
+  await act(async () => {
+    render(<CustomerRewards />);
+  });
+  const harishElement = await waitFor(() => screen.findByText(/Harish/i));
+  expect(harishElement).toBeInTheDocument();
 });
 
 test("Fetch is called and displayed in the UI", async () => {

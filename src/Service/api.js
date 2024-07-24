@@ -1,9 +1,13 @@
 import data from "./CustomerData";
-// Data Fetch  Custome hook Function
+// Data Fetch Customer Hook Function with Error Handling
 export const usefetch = async () => {
-  return new Promise((res) => {
-    setTimeout(() => {
-      res(data);
-    }, 600);
-  });
+  try {
+    const response = await new Promise((resolve, reject) => {
+          resolve(data);
+    });
+
+    return response;
+  } catch (error) {
+    return { error: error.message }; 
+  }
 };

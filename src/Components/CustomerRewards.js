@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { usefetch } from "./common/api";
+import { usefetch } from "../Service/api";
 import log from "loglevel";
 import { toast, ToastContainer } from "react-toastify";
 
 const CustomerRewards = () => {
+    // State hooks for various data and status
   const [dataSet, setDataSet] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
 
+  // Fetch data from the mock file
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true); // Set loading to true before fetching
       setError(null); // Clear any previous errors
       try {
         const result = await usefetch(); // Assuming usefetch fetches customer data
-        log.warn(
+        log.info(
           " %c Data fetch Successfully !....",
           "color:green; font-size:14px"
         ); // Success logger
@@ -56,7 +58,7 @@ const CustomerRewards = () => {
     return transactions.reduce(
       (acc, transaction) => {
         // acc.totalAmount += transaction.amount;
-        acc.totalAmount += Math.floor(transaction.amount);
+        acc.totalAmount += Math.round(transaction.amount);
 
         transaction.points =
           transaction.amount >= 50 && transaction.amount < 100
@@ -65,7 +67,7 @@ const CustomerRewards = () => {
             ? (transaction.amount - 100) * 2 + 50
             : 0;
 
-        acc.totalPoints += Math.floor(transaction.points); 
+        acc.totalPoints += Math.round(transaction.points); 
 
         return acc; // Return the accumulator for the next iteration
       },
@@ -87,26 +89,9 @@ const CustomerRewards = () => {
     const selectedCustomerData = dataSet.find(
       (customer) => customer.id === selectedCustomer
     );
-  
-    if (!selectedCustomerData) {
-      return <div>No data found for selected customer.</div>;
-    }
-  
     const { transactions = [] } = selectedCustomerData;
-  
-    // Filter transactions to include only the last 3 months
-    const currentDate = new Date();
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  
-    const filteredTransactions = transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.date);
-      return transactionDate >= threeMonthsAgo && transactionDate <= currentDate;
-    });
-  
-    // Calculate totals based on filtered transactions
-    const { totalAmount = 0, totalPoints = 0 } = calculateTotals(filteredTransactions);
-  
+    const { totalAmount = 0, totalPoints = 0 } = calculateTotals(transactions);
+
     return (
       <div className="table-responsive">
         <table className="table table-bordered table-striped table-responsive">
@@ -119,12 +104,12 @@ const CustomerRewards = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredTransactions.map((transaction) => (
+            {transactions.map((transaction) => (
               <tr key={transaction.transId}>
                 <td>{transaction.transId}</td>
                 <td>{transaction.date}</td>
-                <td>${Math.floor(transaction.amount)}</td>
-                <td>{Math.floor(transaction.points)}</td>
+                <td>${Math.round(transaction.amount)}</td>
+                <td>{Math.round(transaction.points)}</td>
               </tr>
             ))}
           </tbody>
@@ -140,7 +125,6 @@ const CustomerRewards = () => {
       </div>
     );
   };
-  
 
   return (
     <div className="row">
