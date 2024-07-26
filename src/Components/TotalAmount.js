@@ -13,7 +13,7 @@ const CustomerTotalMonth = () => {
   const [error, setError] = useState(null); // Error state
   const [requiredMonths, setRequiredMonths] = useState([])
 
-// Fetch data from the API when the component mounts
+// Fetch data from the mock file
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true); // Set loading to true before fetching
@@ -81,7 +81,7 @@ const CustomerTotalMonth = () => {
     const newData = dataSet.map((customerRow) => {
       const { transactions = [], customer } = customerRow;
       const customerData = {};
-      let monthlyTotals = calculateMonthlyTotals(transactions);
+      const monthlyTotals = calculateMonthlyTotals(transactions);
 
       // Filter out months not in lastThreeMonths
       const filteredMonthlyTotals = requiredMonths.reduce((acc, month) => {

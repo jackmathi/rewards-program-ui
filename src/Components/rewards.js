@@ -8,14 +8,14 @@ export function calculatePoints(amount) {
     return 2 * (amount - 100) + 50;
   }
 }
-//* Check if a given date is within the last three months.
-export function isValidDate (date) {
+// * Check if a given date is within the last three months.
+export function isValidDate(date) {
   const currentDate = new Date();
-  const expectedDate = new Date();
+  const expectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, currentDate.getDate());
   const transactionDate = new Date(date);
-  expectedDate.setMonth(currentDate.getMonth() - 3);
   return expectedDate <= transactionDate && transactionDate <= currentDate;
 }
+
 
 // * Calculate monthly reward points based on transactions.
 export function calculateMonthlyPoints(transactions) {
