@@ -14,7 +14,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.resetAllMocks(); // clean for the test mocks 
 });
 
 test('renders CustomerRewards component correctly', async () => {

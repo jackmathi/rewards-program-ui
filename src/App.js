@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useEffect } from "react";
+import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./Components/Header";
@@ -8,22 +8,21 @@ import RewardsReport from "./Components/RewardsReport";
 import CustomerTotalMonth from "./Components/TotalAmount";
 
 function App() {
-  useEffect(() => {
-    window.process = {
-      ...window.process,
-    };
-  }, []);
   return (
     <>
       <div className="container-fluid">
         <BrowserRouter>
           <div className="container">
             <div className="row">
+               {/* Header component */}
               <Header />
               <div className="mainBody">
                 <Routes>
+                   {/* Route for Customer Rewards page */}
                   <Route path="/" element={<CustomerRewards />} />
+                    {/* Route for Rewards Report page */}
                   <Route path="rewardreport" element={<RewardsReport />} />
+                     {/* Route for Customer Total Amount page */}
                   <Route path="totalamout" element={<CustomerTotalMonth />} />
                 </Routes>
               </div>

@@ -22,22 +22,22 @@ describe("CustomerTotalMonth", () => {
       id: 1,
       customer: "Harini",
       transactions: [
-        { transId: 101, date: "2023-05-01", amount: 135.60000002, points: null },
-        { transId: 102, date: "2024-05-18", amount: 102, points: null },
-        { transId: 103, date: "2024-06-05", amount: 30.60000002, points: null },
-        { transId: 104, date: "2024-06-10", amount: 79, points: null },
-        { transId: 105, date: "2024-07-01", amount: 176, points: null },
+        { transId: 101, date: "2023-04-01", amount: 41.40000002},
+        { transId: 102, date: "2024-06-18", amount: 60},
+        { transId: 103, date: "2024-07-05", amount: 100},
+        { transId: 104, date: "2024-07-10", amount: 120},
+        { transId: 105, date: "2024-08-01", amount: 128},
       ],
-    },
+    }, 
     {
       id: 2,
       customer: "Harish",
       transactions: [
-        { transId: 201, date: "2024-05-01", amount: 213, points: null },
-        { transId: 202, date: "2024-05-12", amount: 51, points: null },
-        { transId: 203, date: "2024-06-15", amount: 234, points: null },
-        { transId: 204, date: "2024-06-01", amount: 197.7525, points: null },
-        { transId: 205, date: "2024-07-05", amount: 75, points: null },
+        { transId: 201, date: "2024-06-01", amount: 213 },
+        { transId: 202, date: "2024-06-12", amount: 11},
+        { transId: 203, date: "2024-07-15", amount: 234},
+        { transId: 204, date: "2024-07-01", amount: 197},
+        { transId: 205, date: "2024-08-01", amount: 75},
       ],
     },
   ];
@@ -61,10 +61,10 @@ describe("CustomerTotalMonth", () => {
     expect(screen.getByText("Harish")).toBeInTheDocument();
 
     // Check if monthly totals are rendered correctly
-    expect(screen.getByText("May 2024")).toBeInTheDocument();
     expect(screen.getByText("June 2024")).toBeInTheDocument();
-    expect(screen.getByText("102")).toBeInTheDocument(); 
-    expect(screen.getByText("264")).toBeInTheDocument(); 
+    expect(screen.getByText("July 2024")).toBeInTheDocument();
+    expect(screen.getByText("60")).toBeInTheDocument(); 
+    expect(screen.getByText("224")).toBeInTheDocument(); 
   });
 
   test("handles no customer data available", async () => {
@@ -74,10 +74,7 @@ describe("CustomerTotalMonth", () => {
     await act(async () => {
       render(<CustomerTotalMonth />);
     });
-  
 
-    // Check if no customer data available message is rendered
-    //expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   test("handles data fetch error", async () => {
@@ -90,6 +87,6 @@ describe("CustomerTotalMonth", () => {
 
     // Check if data fetch error message is logged
     expect(log.error).toHaveBeenCalledWith("Custom hook Data fetch error!....");
-    // You can also check if the error message is displayed to the user, if applicable
+    // error message is displayed to the user
   });
 });

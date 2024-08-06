@@ -73,3 +73,10 @@ li a:hover {
   justify-content: center;
   align-items: center;
 }
+.custome-name
+{
+  background-color: #0d6efd;
+  padding: 7px;
+  display: inline;
+  color: #ffffff;
+}

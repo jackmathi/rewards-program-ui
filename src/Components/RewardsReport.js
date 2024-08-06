@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import data from "../Service/CustomerData";
+import { usefetch } from "../Service/api";
 import { calculateMonthlyPoints, calculatePoints, isValidDate } from "./rewards"; // Importing necessary functions
 import log from "loglevel"; // Importing logging library
 import { toast, ToastContainer } from "react-toastify";
@@ -15,11 +15,7 @@ function RewardsReport() {
       setError(null); // Clear any previous errors
 
       try {
-        // Simulate asynchronous API call
-        const simulatedResponse = await new Promise((resolve) =>
-          setTimeout(() => resolve(data), 1000) // Simulate delay
-        );
-
+        const simulatedResponse = await usefetch(); // fetches customer data
         // Process and update data
         const processedData = simulatedResponse.map((customer) => {
           const {transactions} = customer;
@@ -42,7 +38,7 @@ function RewardsReport() {
       } catch (error) {
         toast.error("Error Fetching Customer Data!", {
           position: "top-right",
-          autoClose: 10000, // Close after 10 seconds
+          autoClose: 5000, // Close after 5 seconds
         }); // Display toast error message
         log.error("Rewards Report fetch error!....", error); // Log error
         setError(error); // Set error state
@@ -54,7 +50,7 @@ function RewardsReport() {
     fetchData(); // Fetch data on component mount
     toast.success("Fetching Customer Data Successfully!", {
       position: "top-right",
-      autoClose: 10000, // Close after 10 seconds
+      autoClose: 5000, // Close after 5 seconds
     });// Display toast Success message
     
   }, []); // Empty dependency array ensures this effect runs only once

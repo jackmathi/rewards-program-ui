@@ -24,7 +24,7 @@ const CustomerRewards = () => {
         setDataSet(result);
         toast.success("Fetching Customer Data Successfully!", {
           position: "top-right",
-          autoClose: 10000, // Close after 10 seconds
+          autoClose: 5000, // Close after 5 seconds
         }); // Display toast Success message
         // Set the first customer as selected initially
         if (result.length > 0) {
@@ -34,7 +34,7 @@ const CustomerRewards = () => {
         setError(error); // Set error state
         toast.error("Error Fetching Customer Data!", {
           position: "top-right",
-          autoClose: 10000, // Close after 10 seconds
+          autoClose: 5000, // Close after 5 seconds
         }); // Display toast error message
         log.error("Error Fetching Customer Data!...."); // Logger error
         console.error(error);
@@ -57,13 +57,12 @@ const CustomerRewards = () => {
   const calculateTotals = (transactions) => {
     return transactions.reduce(
       (acc, transaction) => {
-        // acc.totalAmount += transaction.amount;
+        
         acc.totalAmount += Math.round(transaction.amount);
-
         transaction.points =
           transaction.amount >= 50 && transaction.amount < 100
             ? transaction.amount - 50
-            : transaction.amount > 100
+            : transaction.amount >= 100
             ? (transaction.amount - 100) * 2 + 50
             : 0;
 
@@ -94,6 +93,8 @@ const CustomerRewards = () => {
 
     return (
       <div className="table-responsive">
+         <h4 className="custome-name">Name: {selectedCustomerData.customer}</h4> {/* Display customer name above table */}
+         <hr></hr>
         <table className="table table-bordered table-striped table-responsive">
           <thead>
             <tr>

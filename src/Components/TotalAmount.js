@@ -24,13 +24,13 @@ const CustomerTotalMonth = () => {
         setDataSet(result);
         toast.success("Fetching Customer Data Successfully!", {
           position: "top-right",
-          autoClose: 10000, // Close after 10 seconds
+          autoClose: 5000, // Close after 5 seconds
         });
       } catch (error) {
         log.error("Custom hook Data fetch error!....");
         toast.error("Error Fetching Customer Data!", {
           position: "top-right",
-          autoClose: 10000, // Close after 10 seconds
+          autoClose: 5000, // Close after 5 seconds
         });
       } finally {
         setIsLoading(false); // Set loading to false after fetch completes
@@ -120,11 +120,7 @@ const CustomerTotalMonth = () => {
     return sortedObj;
   };
 
-  /**
-   * 
-   * @param {*} transactions -Array which is having list of transaction of the customer
-   * @returns 
-   */
+  // transaction of the customer list
   const calculateMonthlyTotals = (transactions) => {
     return transactions.reduce((monthlyTotals, transaction) => {
       if (!transaction.amount) return monthlyTotals;
