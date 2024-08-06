@@ -24,12 +24,12 @@ Total points earned: 40 points + 50 points = 90 points
 
 ## 2. **Customer Reward Points**
    - **Component Name:** RewardsReport
-   - Calculates reward points monthly and provides a total summary.
+   - Calculates reward points for the current month and the last 3 months, providing a total summary.
    - Also computes reward points on a per-user basis.
 
 ## 3. **Customer Total Amount**
    - **Component Name:** TotalMonth
-   - Calculates and displays the total amount spent by users monthly.
+   - Calculates and displays the total amount spent by users for the current month and the previous 3 months.
    - Provides a breakdown of total amounts spent per user.
 
 ## We utilized the following React libraries for development:
@@ -37,3 +37,6 @@ Total points earned: 40 points + 50 points = 90 points
 - loglevel for logging purposes
 - React Router
 - Toast Library (Error and success messages will be clearly displayed in the user interface.)
+
+  ## Testing Document
+  - Testing document url :  https://github.com/jackmathi/rewards-program-ui/tree/main/Document
